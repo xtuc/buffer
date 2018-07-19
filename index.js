@@ -8,7 +8,7 @@
 
 'use strict'
 
-import { write, read } from 'ieee754'
+import { write, read } from '@xtuc/ieee754'
 
 export const INSPECT_MAX_BYTES = 50
 
