@@ -11,12 +11,10 @@
 var base64 = require('base64-js')
 var ieee754 = require('ieee754')
 
-exports.Buffer = Buffer
-exports.SlowBuffer = SlowBuffer
-exports.INSPECT_MAX_BYTES = 50
+export const INSPECT_MAX_BYTES = 50
 
 var K_MAX_LENGTH = 0x7fffffff
-exports.kMaxLength = K_MAX_LENGTH
+export const kMaxLength = K_MAX_LENGTH
 
 /**
  * If `Buffer.TYPED_ARRAY_SUPPORT`:
@@ -89,7 +87,7 @@ function createBuffer (length) {
  * The `Uint8Array` prototype remains unmodified.
  */
 
-function Buffer (arg, encodingOrOffset, length) {
+export function Buffer (arg, encodingOrOffset, length) {
   // Common case.
   if (typeof arg === 'number') {
     if (typeof encodingOrOffset === 'string') {
@@ -321,7 +319,7 @@ function checked (length) {
   return length | 0
 }
 
-function SlowBuffer (length) {
+export function SlowBuffer (length) {
   if (+length != length) { // eslint-disable-line eqeqeq
     length = 0
   }
@@ -599,7 +597,7 @@ Buffer.prototype.equals = function equals (b) {
 
 Buffer.prototype.inspect = function inspect () {
   var str = ''
-  var max = exports.INSPECT_MAX_BYTES
+  var max = INSPECT_MAX_BYTES
   str = this.toString('hex', 0, max).replace(/(.{2})/g, '$1 ').trim()
   if (this.length > max) str += ' ... '
   return '<Buffer ' + str + '>'

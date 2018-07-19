@@ -2,3 +2,5 @@
 .airtap.yml
 *.log
 node_modules/
+dist/
+package-lock.json

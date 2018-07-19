@@ -1,7 +1,7 @@
 {
-  "name": "buffer",
+  "name": "@xtuc/buffer",
   "description": "Node.js Buffer API, for the browser",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "author": {
     "name": "Feross Aboukhadijeh",
     "email": "feross@feross.org",
@@ -15,6 +15,9 @@
     "James Halliday <mail@substack.net>"
   ],
   "dependencies": {
+    "@babel/cli": "^7.0.0-beta.54",
+    "@babel/core": "^7.0.0-beta.54",
+    "@babel/plugin-transform-modules-commonjs": "^7.0.0-beta.54",
     "base64-js": "^1.0.2",
     "ieee754": "^1.1.4"
   },
@@ -50,7 +53,8 @@
     "uint8array"
   ],
   "license": "MIT",
-  "main": "index.js",
+  "main": "dist/index.cjs.js",
+  "module": "index.js",
   "types": "index.d.ts",
   "repository": {
     "type": "git",
@@ -66,7 +70,8 @@
     "test-browser-es6": "airtap -- test/*.js test/node/*.js",
     "test-browser-es6-local": "airtap --local -- test/*.js test/node/*.js",
     "test-node": "tape test/*.js test/node/*.js",
-    "update-authors": "./bin/update-authors.sh"
+    "update-authors": "./bin/update-authors.sh",
+    "prepublish": "babel --plugins @babel/plugin-transform-modules-commonjs index.js -o dist/index.cjs.js"
   },
   "standard": {
     "ignore": [
