@@ -8,8 +8,7 @@
 
 'use strict'
 
-var base64 = require('base64-js')
-var ieee754 = require('ieee754')
+import { write, read } from 'ieee754'
 
 export const INSPECT_MAX_BYTES = 50
 
@@ -366,7 +365,6 @@ Buffer.isEncoding = function isEncoding (encoding) {
     case 'ascii':
     case 'latin1':
     case 'binary':
-    case 'base64':
     case 'ucs2':
     case 'ucs-2':
     case 'utf16le':
@@ -446,8 +444,6 @@ function byteLength (string, encoding) {
         return len * 2
       case 'hex':
         return len >>> 1
-      case 'base64':
-        return base64ToBytes(string).length
       default:
         if (loweredCase) {
           return mustMatch ? -1 : utf8ToBytes(string).length // assume utf8
@@ -511,9 +507,6 @@ function slowToString (encoding, start, end) {
       case 'latin1':
       case 'binary':
         return latin1Slice(this, start, end)
-
-      case 'base64':
-        return base64Slice(this, start, end)
 
       case 'ucs2':
       case 'ucs-2':
@@ -838,10 +831,6 @@ function latin1Write (buf, string, offset, length) {
   return asciiWrite(buf, string, offset, length)
 }
 
-function base64Write (buf, string, offset, length) {
-  return blitBuffer(base64ToBytes(string), buf, offset, length)
-}
-
 function ucs2Write (buf, string, offset, length) {
   return blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length)
 }
@@ -899,10 +888,6 @@ Buffer.prototype.write = function write (string, offset, length, encoding) {
       case 'binary':
         return latin1Write(this, string, offset, length)
 
-      case 'base64':
-        // Warning: maxLength not taken into account in base64Write
-        return base64Write(this, string, offset, length)
-
       case 'ucs2':
       case 'ucs-2':
       case 'utf16le':
@@ -921,14 +906,6 @@ Buffer.prototype.toJSON = function toJSON () {
   return {
     type: 'Buffer',
     data: Array.prototype.slice.call(this._arr || this, 0)
-  }
-}
-
-function base64Slice (buf, start, end) {
-  if (start === 0 && end === buf.length) {
-    return base64.fromByteArray(buf)
-  } else {
-    return base64.fromByteArray(buf.slice(start, end))
   }
 }
 
@@ -1254,25 +1231,25 @@ Buffer.prototype.readInt32BE = function readInt32BE (offset, noAssert) {
 Buffer.prototype.readFloatLE = function readFloatLE (offset, noAssert) {
   offset = offset >>> 0
   if (!noAssert) checkOffset(offset, 4, this.length)
-  return ieee754.read(this, offset, true, 23, 4)
+  return read(this, offset, true, 23, 4)
 }
 
 Buffer.prototype.readFloatBE = function readFloatBE (offset, noAssert) {
   offset = offset >>> 0
   if (!noAssert) checkOffset(offset, 4, this.length)
-  return ieee754.read(this, offset, false, 23, 4)
+  return read(this, offset, false, 23, 4)
 }
 
 Buffer.prototype.readDoubleLE = function readDoubleLE (offset, noAssert) {
   offset = offset >>> 0
   if (!noAssert) checkOffset(offset, 8, this.length)
-  return ieee754.read(this, offset, true, 52, 8)
+  return read(this, offset, true, 52, 8)
 }
 
 Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
   offset = offset >>> 0
   if (!noAssert) checkOffset(offset, 8, this.length)
-  return ieee754.read(this, offset, false, 52, 8)
+  return read(this, offset, false, 52, 8)
 }
 
 function checkInt (buf, value, offset, ext, max, min) {
@@ -1474,7 +1451,7 @@ function writeFloat (buf, value, offset, littleEndian, noAssert) {
   if (!noAssert) {
     checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
   }
-  ieee754.write(buf, value, offset, littleEndian, 23, 4)
+  write(buf, value, offset, littleEndian, 23, 4)
   return offset + 4
 }
 
@@ -1492,7 +1469,7 @@ function writeDouble (buf, value, offset, littleEndian, noAssert) {
   if (!noAssert) {
     checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
   }
-  ieee754.write(buf, value, offset, littleEndian, 52, 8)
+  write(buf, value, offset, littleEndian, 52, 8)
   return offset + 8
 }
 
@@ -1623,22 +1600,6 @@ Buffer.prototype.fill = function fill (val, start, end, encoding) {
 // HELPER FUNCTIONS
 // ================
 
-var INVALID_BASE64_RE = /[^+/0-9A-Za-z-_]/g
-
-function base64clean (str) {
-  // Node takes equal signs as end of the Base64 encoding
-  str = str.split('=')[0]
-  // Node strips out invalid characters like \n and \t from the string, base64-js does not
-  str = str.trim().replace(INVALID_BASE64_RE, '')
-  // Node converts strings with length < 2 to ''
-  if (str.length < 2) return ''
-  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
-  while (str.length % 4 !== 0) {
-    str = str + '='
-  }
-  return str
-}
-
 function toHex (n) {
   if (n < 16) return '0' + n.toString(16)
   return n.toString(16)
@@ -1747,10 +1708,6 @@ function utf16leToBytes (str, units) {
   }
 
   return byteArray
-}
-
-function base64ToBytes (str) {
-  return base64.toByteArray(base64clean(str))
 }
 
 function blitBuffer (src, dst, offset, length) {

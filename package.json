@@ -18,8 +18,7 @@
     "@babel/cli": "^7.0.0-beta.54",
     "@babel/core": "^7.0.0-beta.54",
     "@babel/plugin-transform-modules-commonjs": "^7.0.0-beta.54",
-    "base64-js": "^1.0.2",
-    "ieee754": "^1.1.4"
+    "@xtuc/ieee754": "^1.2.0"
   },
   "devDependencies": {
     "airtap": "0.0.7",
