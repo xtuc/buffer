@@ -15,9 +15,6 @@
     "James Halliday <mail@substack.net>"
   ],
   "dependencies": {
-    "@babel/cli": "^7.0.0-beta.54",
-    "@babel/core": "^7.0.0-beta.54",
-    "@babel/plugin-transform-modules-commonjs": "^7.0.0-beta.54",
     "@xtuc/ieee754": "^1.2.0"
   },
   "devDependencies": {
@@ -32,7 +29,10 @@
     "standard": "*",
     "tape": "^4.0.0",
     "through2": "^2.0.0",
-    "uglify-js": "^3.3.12"
+    "uglify-js": "^3.3.12",
+    "@babel/cli": "^7.0.0-beta.54",
+    "@babel/core": "^7.0.0-beta.54",
+    "@babel/plugin-transform-modules-commonjs": "^7.0.0-beta.54"
   },
   "homepage": "https://github.com/feross/buffer",
   "jspm": {
